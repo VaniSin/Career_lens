@@ -1,10 +1,129 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
+  <!-- ═══════════════════════════════════════════════════
+       CORE META
+  ═══════════════════════════════════════════════════ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Career Lens — Intelligent Career Navigation & ATS Analysis</title>
-  <meta name="description" content="Recruiter-calibrated career intelligence. Audit your resume against real ATS filters, identify high-probability career matches, practice company-specific interview loops, and maintain your verified digital portfolio.">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- ═══════════════════════════════════════════════════
+       PRIMARY SEO
+  ═══════════════════════════════════════════════════ -->
+  <title>CareerLens — AI-Powered Resume Analysis, ATS Audit & Career Intelligence</title>
+  <meta name="description" content="CareerLens is an AI-powered career platform. Audit your resume against real ATS filters, identify career role matches, close skill gaps, practice company-specific mock interviews, and build your verified career portfolio — all in one intelligent workspace.">
+  <meta name="keywords" content="CareerLens, career lens, AI resume analysis, ATS resume checker, resume audit, career intelligence, mock interview, skill gap analysis, job role match, career roadmap, resume optimizer">
+  <meta name="author" content="CareerLens">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <meta name="theme-color" content="#7C3AED">
+
+  <!-- ═══════════════════════════════════════════════════
+       CANONICAL URL
+  ═══════════════════════════════════════════════════ -->
+  <link rel="canonical" href="http://careerlens/">
+
+  <!-- ═══════════════════════════════════════════════════
+       OPEN GRAPH (Facebook / LinkedIn)
+  ═══════════════════════════════════════════════════ -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="http://careerlens/">
+  <meta property="og:site_name"   content="CareerLens">
+  <meta property="og:title"       content="CareerLens — AI-Powered Resume Analysis & Career Intelligence">
+  <meta property="og:description" content="Audit your resume against real ATS filters, identify career matches, close skill gaps, and practice mock interviews. CareerLens is your intelligent career command center.">
+  <meta property="og:image"       content="http://careerlens/static/favicon.png">
+  <meta property="og:image:width"  content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt"    content="CareerLens logo — AI-powered career intelligence platform">
+  <meta property="og:locale"      content="en_US">
+
+  <!-- ═══════════════════════════════════════════════════
+       TWITTER CARD
+  ═══════════════════════════════════════════════════ -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="CareerLens — AI Resume Analysis & Career Intelligence">
+  <meta name="twitter:description" content="ATS resume audit, skill gap analysis, mock interviews, and career roadmaps — powered by AI. Start free at CareerLens.">
+  <meta name="twitter:image"       content="http://careerlens/static/favicon.png">
+  <meta name="twitter:image:alt"   content="CareerLens — AI Career Platform">
+
+  <!-- ═══════════════════════════════════════════════════
+       FAVICONS & APP ICONS
+  ═══════════════════════════════════════════════════ -->
+  <link rel="icon"             href="/static/favicon.png" type="image/png">
+  <link rel="shortcut icon"    href="/static/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/static/favicon.png">
+  <link rel="manifest" href="/static/site.webmanifest">
+
+  <!-- ═══════════════════════════════════════════════════
+       SCHEMA.ORG STRUCTURED DATA
+  ═══════════════════════════════════════════════════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "http://careerlens/#website",
+        "url": "http://careerlens/",
+        "name": "CareerLens",
+        "description": "AI-powered career intelligence platform for resume analysis, ATS auditing, and career growth.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "http://careerlens/#resume"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "http://careerlens/#app",
+        "name": "CareerLens",
+        "url": "http://careerlens/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "description": "CareerLens is an AI-powered career platform that audits resumes against ATS filters, identifies career role matches, generates personalized learning roadmaps, and simulates company-specific mock interview loops.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "ATS Resume Audit",
+          "AI Career Role Matching",
+          "Skill Gap Analysis",
+          "Personalized Learning Roadmap",
+          "Company-Specific Mock Interviews",
+          "Career Portfolio Management",
+          "AI Career Chatbot"
+        ],
+        "screenshot": "http://careerlens/static/favicon.png",
+        "softwareVersion": "2.0"
+      },
+      {
+        "@type": "Organization",
+        "@id": "http://careerlens/#organization",
+        "name": "CareerLens",
+        "url": "http://careerlens/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "http://careerlens/static/favicon.png",
+          "width": 512,
+          "height": 512
+        },
+        "sameAs": [
+          "https://github.com/bhupendrasinghh/Career_Lens"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════
+       FONTS & STYLES
+  ═══════════════════════════════════════════════════ -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -897,25 +1016,35 @@
 <!-- ═══════════════════════════════════════════════════
      FOOTER
 ═══════════════════════════════════════════════════ -->
-<footer class="footer" id="mainFooter">
+<footer class="footer" id="mainFooter" role="contentinfo" aria-label="CareerLens site footer">
   <div class="footer-wrap wrap">
     <div class="footer-brand">
-      <a class="brand" href="#home">
+      <a class="brand" href="#home" aria-label="CareerLens — Back to top">
         <div class="brand-icon" style="width:28px;height:28px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>
         </div>
         <div class="brand-text">Career<span>Lens</span></div>
       </a>
-      <p class="footer-tagline">Precision career navigation & ATS diagnostic intelligence for modern tech careers.</p>
+      <p class="footer-tagline">CareerLens — AI-powered career intelligence platform for resume analysis, ATS auditing, skill gap identification, and mock interview preparation.</p>
+      <nav aria-label="Footer navigation" style="margin-top:12px;">
+        <a href="#home"     style="color:var(--muted);font-size:0.8rem;margin-right:16px;text-decoration:none;">Overview</a>
+        <a href="#how"      style="color:var(--muted);font-size:0.8rem;margin-right:16px;text-decoration:none;">How it Works</a>
+        <a href="#features" style="color:var(--muted);font-size:0.8rem;margin-right:16px;text-decoration:none;">Capabilities</a>
+        <a href="#resume"   style="color:var(--muted);font-size:0.8rem;margin-right:16px;text-decoration:none;">Analyze Resume</a>
+        <a href="https://github.com/bhupendrasinghh/Career_Lens" target="_blank" rel="noopener noreferrer" style="color:var(--muted);font-size:0.8rem;text-decoration:none;">GitHub ↗</a>
+      </nav>
     </div>
     <div class="footer-right">
       <div class="footer-meta">
         <span>Deterministic Scoring</span>
         <span class="footer-sep">&bull;</span>
-        <span>Zero Storage of Raw Resumes</span>
+        <span>AI-Powered Analysis</span>
         <span class="footer-sep">&bull;</span>
         <span class="gmail-pill">Gmail Authentication</span>
       </div>
+      <p style="color:var(--muted);font-size:0.75rem;margin-top:10px;text-align:right;">
+        &copy; <span id="footerYear">2026</span> CareerLens. Built with ❤️ for career growth.
+      </p>
     </div>
   </div>
 </footer>
@@ -964,5 +1093,14 @@
 </div>
 
 <script src="/static/js/main.js"></script>
+<script>
+  // Auto-update copyright year
+  const yr = document.getElementById('footerYear');
+  if (yr) yr.textContent = new Date().getFullYear();
+</script>
+<!-- SEO: noscript fallback for key content -->
+<noscript>
+  <p style="display:none;">CareerLens is an AI-powered career platform offering ATS resume analysis, career role matching, skill gap identification, learning roadmaps, and mock interview practice.</p>
+</noscript>
 </body>
 </html>

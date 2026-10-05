@@ -1,0 +1,19 @@
+{
+  "name": "CareerLens",
+  "short_name": "CareerLens",
+  "description": "AI-powered resume analysis, ATS audit, skill gap analysis, and mock interview preparation.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#7C3AED",
+  "icons": [
+    {
+      "src": "/static/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "education", "business"],
+  "lang": "en-US"
+}

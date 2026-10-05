@@ -1,17 +1,27 @@
 """
 Career Lens — Main Flask Application
 Registers all blueprints and preserves original analyze/upload routes.
+Adds SEO endpoints (robots.txt, sitemap.xml) and DB persistence for analyses.
 """
 
 import os
 import re
 import uuid
+import json
+from datetime import datetime
 
 import fitz
-from flask import Flask, render_template, request, jsonify, session
+from flask import (
+    Flask, render_template, request, jsonify,
+    session, Response, send_from_directory
+)
 
 from ats_analyzer import analyze_resume
-from database import init_db
+from database import (
+    init_db, save_resume_to_db, get_active_resume,
+    save_ats_analysis, save_role_analysis, save_roadmap,
+    get_user_history, get_db, row_to_dict
+)
 from auth import auth_bp
 from portfolio import portfolio_bp
 from interview import interview_bp
@@ -27,6 +37,10 @@ from ai_service import (
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-replace-in-production")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024   # 16 MB global limit
+
+# Site configuration for SEO
+SITE_URL  = os.getenv("SITE_URL", "http://careerlens")
+SITE_NAME = "CareerLens"
 
 # Register blueprints
 app.register_blueprint(auth_bp)
@@ -208,7 +222,56 @@ def analyze_career_skills(resume_text, role):
     }
 
 
-# ─── Original routes (UNCHANGED) ──────────────────────────────────────────────
+# ─── SEO Routes ───────────────────────────────────────────────────────────────
+
+@app.route("/robots.txt")
+def robots_txt():
+    content = f"""User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /uploads/
+Disallow: /portfolio/
+Disallow: /interview/
+Disallow: /chatbot/
+
+Sitemap: {SITE_URL}/sitemap.xml
+"""
+    return Response(content, mimetype="text/plain")
+
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    pages = [
+        {"loc": SITE_URL + "/",             "priority": "1.0", "changefreq": "weekly"},
+        {"loc": SITE_URL + "/#features",    "priority": "0.8", "changefreq": "monthly"},
+        {"loc": SITE_URL + "/#how",         "priority": "0.7", "changefreq": "monthly"},
+        {"loc": SITE_URL + "/#resume",      "priority": "0.9", "changefreq": "weekly"},
+    ]
+    xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml_parts.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    for page in pages:
+        xml_parts.append(f"""  <url>
+    <loc>{page['loc']}</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>{page['changefreq']}</changefreq>
+    <priority>{page['priority']}</priority>
+  </url>""")
+    xml_parts.append("</urlset>")
+    return Response("\n".join(xml_parts), mimetype="application/xml")
+
+
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, "static"),
+        "favicon.png",
+        mimetype="image/png"
+    )
+
+
+# ─── Original routes (UNCHANGED core logic, now with DB persistence) ──────────
 
 @app.route("/")
 def home():
@@ -221,14 +284,42 @@ def upload():
     if not f or not f.filename.lower().endswith(".pdf"):
         return jsonify(error="Please upload a PDF resume."), 400
     try:
-        with fitz.open(stream=f.read(), filetype="pdf") as pdf:
+        file_bytes = f.read()
+        with fitz.open(stream=file_bytes, filetype="pdf") as pdf:
             text = "\n".join(p.get_text("text") for p in pdf)
         if not text.strip():
             return jsonify(error="No selectable text found. Please use a text-based PDF."), 400
+
         rid = str(uuid.uuid4())
         resume_cache[rid] = text
         session["resume_id"] = rid
-        return jsonify(filename=f.filename, words=len(text.split()), characters=len(text))
+
+        word_count  = len(text.split())
+        char_count  = len(text)
+        file_size   = len(file_bytes)
+        original_nm = f.filename
+
+        # Persist resume to DB if user is logged in
+        resume_db_id = None
+        uid = session.get("user_id")
+        if uid:
+            resume_db_id = save_resume_to_db(
+                user_id=uid,
+                filename=rid + ".pdf",
+                original_name=original_nm,
+                file_size=file_size,
+                word_count=word_count,
+                char_count=char_count,
+                raw_text=text,
+            )
+            session["resume_db_id"] = resume_db_id
+
+        return jsonify(
+            filename=original_nm,
+            words=word_count,
+            characters=char_count,
+            resume_db_id=resume_db_id
+        )
     except Exception as e:
         return jsonify(error=f"Could not read this PDF: {e}"), 400
 
@@ -237,10 +328,32 @@ def upload():
 def analyze(feature):
     text = resume_cache.get(session.get("resume_id"))
     if not text:
+        # Try to reload from DB if user is logged in
+        uid = session.get("user_id")
+        if uid:
+            resume_row = get_active_resume(uid)
+            if resume_row and resume_row.get("raw_text"):
+                text = resume_row["raw_text"]
+                rid = str(uuid.uuid4())
+                resume_cache[rid] = text
+                session["resume_id"] = rid
+                session["resume_db_id"] = resume_row["id"]
+
+    if not text:
         return jsonify(error="Please upload your resume again."), 400
 
+    uid          = session.get("user_id")
+    resume_db_id = session.get("resume_db_id")
+
     if feature == "ats":
-        return jsonify(analyze_resume(text))
+        result = analyze_resume(text)
+        # Persist if logged in
+        if uid:
+            try:
+                save_ats_analysis(uid, resume_db_id, result)
+            except Exception:
+                pass
+        return jsonify(result)
 
     if feature == "jobs":
         recommendations = analyze_target_roles_with_llm(text)
@@ -251,20 +364,31 @@ def analyze(feature):
         if not role:
             return jsonify(error="Please select a valid career."), 400
         report = analyze_role_skills_with_llm(text, role)
+        # Persist if logged in
+        if uid:
+            try:
+                save_role_analysis(uid, resume_db_id, role, report)
+            except Exception:
+                pass
         return jsonify(report)
 
     if feature == "roadmap":
         role = ((request.json or {}).get("role") or "").strip()
         if not role:
             return jsonify(error="Please explore a career first."), 400
-
         roadmap = generate_learning_roadmap_with_llm(text, role)
+        # Persist if logged in
+        if uid:
+            try:
+                save_roadmap(uid, resume_db_id, role, roadmap)
+            except Exception:
+                pass
         return jsonify(roadmap)
 
     return jsonify(error="Unknown feature."), 404
 
 
-# ─── Dashboard data endpoint (new) ────────────────────────────────────────────
+# ─── Dashboard data endpoint ──────────────────────────────────────────────────
 
 @app.route("/dashboard/summary", methods=["GET"])
 def dashboard_summary():
@@ -272,7 +396,6 @@ def dashboard_summary():
     if not uid:
         return jsonify(error="Authentication required."), 401
 
-    from database import get_db, row_to_dict
     conn = get_db()
     try:
         doc_count = conn.execute(
@@ -311,6 +434,33 @@ def dashboard_summary():
         )
     finally:
         conn.close()
+
+
+@app.route("/dashboard/history", methods=["GET"])
+def dashboard_history():
+    """Return user's full analysis history (ATS, roles, roadmaps, resumes)."""
+    uid = session.get("user_id")
+    if not uid:
+        return jsonify(error="Authentication required."), 401
+    try:
+        history = get_user_history(uid)
+        return jsonify(history)
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
+
+@app.route("/dashboard/resume", methods=["GET"])
+def get_stored_resume():
+    """Return metadata of the user's most recently active resume."""
+    uid = session.get("user_id")
+    if not uid:
+        return jsonify(error="Authentication required."), 401
+    resume = get_active_resume(uid)
+    if not resume:
+        return jsonify(resume=None)
+    # Never expose raw_text over the wire
+    resume.pop("raw_text", None)
+    return jsonify(resume=resume)
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────
