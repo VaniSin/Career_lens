@@ -318,5 +318,6 @@ def dashboard_summary():
 if __name__ == "__main__":
     init_db()
     port = int(os.environ.get("PORT", 5001))
-    print(f"Starting Career Lens on http://127.0.0.1:{port}")
-    app.run(debug=True, port=port)
+    host = os.environ.get("HOST", "0.0.0.0")
+    print(f"Starting Career Lens on http://127.0.0.1:{port} (accessible via http://localhost:{port} or custom host)")
+    app.run(debug=True, host=host, port=port)
