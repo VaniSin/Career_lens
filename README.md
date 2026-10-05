@@ -73,6 +73,21 @@ PORT=5001
 ```
 
 ### 5. Run the Application
+
+#### Option A: Run with Docker & Docker Compose (Recommended)
+```bash
+docker compose up -d --build
+```
+Check container logs:
+```bash
+docker compose logs -f
+```
+Stop the container:
+```bash
+docker compose down
+```
+
+#### Option B: Run Directly with Python
 ```bash
 python3 app.py
 ```
@@ -83,6 +98,9 @@ Open [http://127.0.0.1:5001](http://127.0.0.1:5001) in your browser.
 ## 📁 Project Structure
 
 ```
+├── Dockerfile              # Production multi-stage Docker configuration
+├── docker-compose.yml      # Single-command orchestration with volume mounts
+├── .dockerignore           # Excludes local environments & secrets from images
 ├── app.py                  # Main Flask application & routes
 ├── ai_service.py           # Core AI/LLM service layer (Groq integration)
 ├── interview.py            # Mock interview Blueprint & evaluation logic

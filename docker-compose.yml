@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  careerlens:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: careerlens_app
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+    environment:
+      - PORT=5001
+      - DATABASE_PATH=/app/data/careerlens.db
+    volumes:
+      - careerlens_data:/app/data
+      - careerlens_uploads:/app/uploads
+
+volumes:
+  careerlens_data:
+    driver: local
+  careerlens_uploads:
+    driver: local

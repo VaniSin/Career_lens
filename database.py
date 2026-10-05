@@ -6,7 +6,8 @@ Handles SQLite connection and schema initialization.
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "careerlens.db")
+DB_PATH = os.getenv("DATABASE_PATH", os.path.join(os.path.dirname(__file__), "careerlens.db"))
+os.makedirs(os.path.dirname(os.path.abspath(DB_PATH)), exist_ok=True)
 
 
 def get_db():
