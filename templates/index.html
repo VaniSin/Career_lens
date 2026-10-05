@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Career Lens — Intelligent Career Navigation & ATS Analysis</title>
+  <meta name="description" content="Recruiter-calibrated career intelligence. Audit your resume against real ATS filters, identify high-probability career matches, practice company-specific interview loops, and maintain your verified digital portfolio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     WELCOME MODAL (Hidden by default to avoid interrupting user)
+═══════════════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="welcomeModal">
+  <div class="modal-box">
+    <div class="welcome-box">
+      <div class="welcome-spark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <span class="section-eyebrow" style="justify-content:center;display:flex;margin-bottom:10px;">WELCOME TO CAREER LENS</span>
+      <h2 class="modal-title">Welcome to Your Career Command Center</h2>
+      <p class="modal-subtitle" style="margin:10px 0 28px;">Analyze your resume, discover role alignments, identify technical skill gaps, and prepare for company-specific interview rounds.</p>
+      <button class="btn btn-primary btn-full btn-lg" id="welcomeStart">Get started →</button>
+      <button class="btn btn-ghost btn-full mt-12" id="welcomeSkip">Explore website</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     AUTH MODAL (Login / Register)
+═══════════════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="authModal">
+  <div class="modal-box">
+    <!-- Login Form -->
+    <div id="loginPane">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h2 class="modal-title">Sign in to Career Lens</h2>
+        <p class="modal-subtitle">Access your personalized dashboard, portfolio & interview drills.</p>
+      </div>
+      <div class="modal-body">
+        <div class="modal-form-body">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">
+              Gmail address
+              <span class="gmail-pill">@gmail.com only</span>
+            </label>
+            <input class="form-input" type="email" id="loginEmail" placeholder="yourname@gmail.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input class="form-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <div class="alert alert-error hidden" id="loginError"></div>
+          <button class="btn btn-primary btn-full btn-lg" id="loginBtn">Sign in</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        Don't have an account? <a href="#" id="showRegister">Create one free →</a>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="#" id="closeAuthModal" class="text-muted">Cancel</a>
+      </div>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerPane" class="hidden">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+        </div>
+        <h2 class="modal-title">Create your account</h2>
+        <p class="modal-subtitle">Start auditing your resume and preparing for interview loops.</p>
+      </div>
+      <div class="modal-body">
+        <div class="modal-form-body">
+          <div class="form-group">
+            <label class="form-label" for="regName">Full name</label>
+            <input class="form-input" type="text" id="regName" placeholder="Alex Chen" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regEmail">
+              Gmail address
+              <span class="gmail-pill">@gmail.com only</span>
+            </label>
+            <input class="form-input" type="email" id="regEmail" placeholder="yourname@gmail.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regPassword">Password</label>
+            <input class="form-input" type="password" id="regPassword" placeholder="Minimum 8 characters" autocomplete="new-password">
+          </div>
+          <div class="alert alert-error hidden" id="registerError"></div>
+          <button class="btn btn-primary btn-full btn-lg" id="registerBtn">Create account →</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        Already have an account? <a href="#" id="showLogin">Sign in →</a>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="#" id="closeAuthModal2" class="text-muted">Cancel</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════ -->
+<header>
+  <a class="brand" href="#home">
+    <div class="brand-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
+      </svg>
+    </div>
+    <div class="brand-text">Career<span>Lens</span></div>
+  </a>
+
+  <nav class="header-nav" id="mainNav">
+    <a href="#home">Overview</a>
+    <a href="#how">How it Works</a>
+    <a href="#features">Capabilities</a>
+    <a href="#resume">Analyze Resume</a>
+  </nav>
+
+  <div class="header-actions">
+    <!-- Shown when NOT logged in -->
+    <div id="headerGuest">
+      <button class="btn btn-ghost btn-sm" id="headerLoginBtn">Sign in</button>
+      <button class="btn btn-primary btn-sm" id="headerRegisterBtn">Get started free →</button>
+    </div>
+
+    <!-- Shown when logged in -->
+    <div id="headerUser" class="hidden">
+      <div class="user-menu" id="userMenuWrap">
+        <div class="user-avatar" id="userAvatarBtn" title="Account settings">U</div>
+        <div class="user-dropdown hidden" id="userDropdown">
+          <div class="user-dropdown-header">
+            <div class="user-dropdown-name" id="ddName">User</div>
+            <div class="user-dropdown-email" id="ddEmail">user@gmail.com</div>
+          </div>
+          <div class="user-dropdown-links">
+            <button class="user-dropdown-link" onclick="showDashboardPage('overview')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              Dashboard
+            </button>
+            <button class="user-dropdown-link" onclick="showDashboardPage('portfolio')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+              Career Portfolio
+            </button>
+            <button class="user-dropdown-link" onclick="showDashboardPage('interviews')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              Mock Interviews
+            </button>
+            <button class="user-dropdown-link" onclick="showDashboardPage('profile')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Profile & Settings
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="user-dropdown-link danger" id="logoutBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+              Sign out
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="hamb" id="hambBtn" aria-label="Toggle Navigation">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN — HOME PAGE
+═══════════════════════════════════════════════════ -->
+<main id="homePage">
+
+  <!-- ── Hero ── -->
+  <section class="wrap hero" id="home">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        <span>Recruiter-Calibrated Career Intelligence</span>
+      </div>
+      <h1>Architect your career.<br><em>With clear data.</em></h1>
+      <p class="hero-lead">Move beyond guesswork. Audit your resume against real applicant tracking systems, bridge technical skill gaps, and practice company-specific interview loops in a single workspace.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" href="#resume">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Resume & Audit
+        </a>
+        <a class="btn btn-ghost btn-lg" href="#how">Explore methodology ↓</a>
+      </div>
+      <div class="hero-proof">
+        <span class="hero-proof-dot"></span>
+        <span>Zero fluff &middot; Strict privacy &middot; Instant structured feedback</span>
+      </div>
+    </div>
+
+    <!-- Realistic High-Craft Product Preview -->
+    <div class="hero-visual">
+      <div class="product-preview-card">
+        <!-- Titlebar -->
+        <div class="preview-titlebar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="preview-filename">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            resume_audit_report.pdf
+          </div>
+          <span class="preview-status-pill">Parsed & Indexed</span>
+        </div>
+
+        <!-- Metric Top Bar -->
+        <div class="preview-score-grid">
+          <div class="score-dial-wrap">
+            <div class="score-number">88<span class="score-total">/100</span></div>
+            <div class="score-label">ATS Compatibility</div>
+          </div>
+          <div class="preview-quick-stats">
+            <div class="stat-pill success">
+              <span class="stat-dot"></span>
+              <strong>14</strong> Core Skills Found
+            </div>
+            <div class="stat-pill success">
+              <span class="stat-dot"></span>
+              Standard Single-Column Layout
+            </div>
+            <div class="stat-pill warning">
+              <span class="stat-dot"></span>
+              Add Metrics to 2 Bullet Points
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Match Showcase -->
+        <div class="preview-matches">
+          <div class="preview-match-row">
+            <div class="match-info">
+              <div class="match-role">Data Analyst</div>
+              <div class="match-skills">SQL, Python, Tableau, Statistics</div>
+            </div>
+            <div class="match-badge">94% Match</div>
+          </div>
+          <div class="preview-match-row">
+            <div class="match-info">
+              <div class="match-role">Software Developer</div>
+              <div class="match-skills">Python, Git, REST APIs, Databases</div>
+            </div>
+            <div class="match-badge">89% Match</div>
+          </div>
+        </div>
+
+        <!-- Interview Mini Card -->
+        <div class="preview-interview-card">
+          <div class="interview-badge">
+            <span class="interview-pulse"></span>
+            Next Recommended Step
+          </div>
+          <div class="interview-title">Mock Interview: Google Software Engineer Loop</div>
+          <div class="interview-sub">5 curated behavioral, system design, and technical prompts ready.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Trust Strip ── -->
+  <div class="strip">
+    <div class="strip-item">
+      <span class="strip-num">01</span>
+      <span>Deterministic ATS Scoring</span>
+    </div>
+    <div class="strip-divider"></div>
+    <div class="strip-item">
+      <span class="strip-num">02</span>
+      <span>Empirical Skill Gap Mapping</span>
+    </div>
+    <div class="strip-divider"></div>
+    <div class="strip-item">
+      <span class="strip-num">03</span>
+      <span>Company-Specific Interview Loop Practice</span>
+    </div>
+  </div>
+
+  <!-- ── Upload Section ── -->
+  <section class="wrap upload-section" id="resume">
+    <div class="section-center">
+      <span class="section-eyebrow">DOCUMENT AUDIT</span>
+      <h2 class="section-title">Analyze your resume in seconds.</h2>
+      <p class="section-lead">Upload your existing PDF resume. We parse section hierarchy, keyword density, and contact verification with zero data leakage.</p>
+    </div>
+
+    <form id="uploadForm" class="drop-zone" novalidate>
+      <div class="drop-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+          <path d="M12 12v9"/>
+          <path d="m16 16-4-4-4 4"/>
+        </svg>
+      </div>
+      <h3 class="drop-title">Select your resume PDF</h3>
+      <p class="drop-subtitle">Drag and drop your file here, or browse from your computer.</p>
+
+      <label class="file-picker-label" for="fileInput">
+        <span class="picker-btn">Choose PDF File</span>
+        <span class="picker-name" id="fileNameDisplay">No file selected</span>
+      </label>
+      <input id="fileInput" name="resume" type="file" accept=".pdf,application/pdf" hidden>
+
+      <br>
+      <button class="btn btn-primary btn-lg" type="submit" id="uploadBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Analyze Resume Now
+      </button>
+      <span class="drop-hint">Format: Text-searchable PDF &nbsp;&bull;&nbsp; Size limit: 10 MB &nbsp;&bull;&nbsp; Encrypted & Private</span>
+      <div class="upload-message" id="uploadMessage"></div>
+    </form>
+
+    <div class="ready-banner hidden" id="readyBanner">
+      <div class="ready-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ready-text">
+        <div class="ready-filename" id="readyFileName">Resume uploaded</div>
+        <div class="ready-stats" id="readyStats"></div>
+      </div>
+      <div class="ready-badge">ANALYSIS READY</div>
+    </div>
+  </section>
+
+  <!-- ── Career Tools Dashboard ── -->
+  <section class="wrap tools-section" id="dashboard" hidden>
+    <div class="tools-header-row">
+      <div>
+        <span class="section-eyebrow">DIAGNOSTIC MODULES</span>
+        <h2 class="section-title">Select your analysis module</h2>
+      </div>
+      <p class="section-lead" style="margin:0;">Detailed evaluations tailored to your uploaded experience.</p>
+    </div>
+
+    <div class="tools-grid" id="toolCards">
+      <button class="tool-card" data-feature="ats">
+        <div class="tool-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+        </div>
+        <div class="tool-tag">MODULE 01 &middot; AUDIT</div>
+        <div class="tool-title">ATS Resume Score</div>
+        <p class="tool-desc">Comprehensive audit of sections, contact info, keyword relevance, and formatting standards.</p>
+        <div class="tool-cta">Run ATS evaluation &rarr;</div>
+      </button>
+
+      <button class="tool-card green" data-feature="jobs">
+        <div class="tool-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        </div>
+        <div class="tool-tag">MODULE 02 &middot; MATCHING</div>
+        <div class="tool-title">Target Role Alignment</div>
+        <p class="tool-desc">Cross-reference your experience against 8 high-demand career pathways to calculate skill overlap.</p>
+        <div class="tool-cta">Compare job matches &rarr;</div>
+      </button>
+
+      <button class="tool-card violet" data-feature="roadmap">
+        <div class="tool-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+        </div>
+        <div class="tool-tag">MODULE 03 &middot; EXECUTION</div>
+        <div class="tool-title">Actionable Learning Roadmap</div>
+        <p class="tool-desc">Transform identified skill gaps into prioritized, week-by-week study milestones and project goals.</p>
+        <div class="tool-cta">Generate roadmap &rarr;</div>
+      </button>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="results-panel hidden" id="resultsPanel">
+      <div class="results-header">
+        <div>
+          <div class="results-kicker" id="resultKicker">CAREER INSIGHTS</div>
+          <div class="results-title" id="resultTitle"></div>
+        </div>
+        <button class="results-close" id="closeResults" aria-label="Close Results">&times;</button>
+      </div>
+      <div class="results-body" id="resultsContent"></div>
+    </div>
+  </section>
+
+  <!-- ── How It Works ── -->
+  <section class="wrap how-section" id="how">
+    <div class="section-center">
+      <span class="section-eyebrow">METHODOLOGY</span>
+      <h2 class="section-title">Designed with hiring rigor.</h2>
+      <p class="section-lead">A systematic methodology built around how recruiting systems and engineering managers evaluate talent.</p>
+    </div>
+
+    <div class="steps-grid">
+      <article class="step-card">
+        <div class="step-num">01</div>
+        <h3 class="step-title">Extract & Parse</h3>
+        <p class="step-desc">Direct text and token extraction identifies your professional credentials, certifications, and technical proficiencies.</p>
+      </article>
+      <article class="step-card">
+        <div class="step-num">02</div>
+        <h3 class="step-title">Benchmark & Map</h3>
+        <p class="step-desc">Heuristics match your profile against real job descriptions to isolate exact skill gaps and keyword discrepancies.</p>
+      </article>
+      <article class="step-card">
+        <div class="step-num">03</div>
+        <h3 class="step-title">Execute & Drill</h3>
+        <p class="step-desc">Prepare using customized learning roadmaps and practice with company-specific technical and behavioral mock interview loops.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Features Showcase ── -->
+  <section class="features-section" id="features">
+    <div class="wrap">
+      <div class="section-center">
+        <span class="section-eyebrow">CORE CAPABILITIES</span>
+        <h2 class="section-title">Every tool needed to advance your career.</h2>
+        <p class="section-lead">From resume parsing to mock interview simulations — unified in one clean interface.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-tile">
+          <div class="feature-tile-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div class="feature-tile-title">ATS Resume Analyzer</div>
+          <p class="feature-tile-desc">Objective scoring with section-by-section breakdown, keyword density checks, and actionable recruiter advice.</p>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+          </div>
+          <div class="feature-tile-title">Role Fit Diagnostics</div>
+          <p class="feature-tile-desc">Identifies high-probability role matches across Data Science, Engineering, and Analytics based on current skill overlap.</p>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          </div>
+          <div class="feature-tile-title">Digital Career Portfolio</div>
+          <p class="feature-tile-desc">Centrally store and organize your certifications, diplomas, experience letters, and portfolio projects.</p>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="feature-tile-title">Company Mock Interviews</div>
+          <p class="feature-tile-desc">Practice real company loops (Google, Amazon, TCS, Startups) with role-targeted technical and behavioral drills.</p>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="feature-tile-title">Career Intelligence Assistant</div>
+          <p class="feature-tile-desc">Real multi-turn career advisor capable of deep resume tailoring, salary negotiation scripts, and technical prep.</p>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+          </div>
+          <div class="feature-tile-title">Targeted Learning Roadmap</div>
+          <p class="feature-tile-desc">Structured, week-by-week progression plans designed to close specific skill gaps for your target job title.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <div>
+      <span class="section-eyebrow" style="color:#93c5fd">START YOUR AUDIT</span>
+      <h2 class="section-title">Ready to take control of your career path?</h2>
+      <p class="section-lead">Upload your resume now to inspect your ATS score and unlock personalized insights.</p>
+    </div>
+    <a class="btn-cta" href="#resume">Get Started Free &rarr;</a>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════
+     USER DASHBOARD PAGE
+═══════════════════════════════════════════════════ -->
+<main class="hidden" id="dashboardPage">
+  <div class="dashboard-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section" style="padding:0 20px;margin-bottom:20px;">
+        <a class="brand" href="#" onclick="showHomePage()" style="font-size:17px;">
+          <div class="brand-icon" style="width:30px;height:30px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>
+          </div>
+          <div class="brand-text" style="color:white;">Career<span>Lens</span></div>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">WORKSPACE</div>
+        <button class="sidebar-link active" id="sideOverview" onclick="showDashboardSection('overview')">
+          <span class="sidebar-link-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          </span>
+          Dashboard
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">CAREER TOOLS</div>
+        <button class="sidebar-link" id="sidePortfolio" onclick="showDashboardSection('portfolio')">
+          <span class="sidebar-link-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          </span>
+          Career Portfolio
+        </button>
+        <button class="sidebar-link" id="sideInterviews" onclick="showDashboardSection('interviews')">
+          <span class="sidebar-link-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          </span>
+          Mock Interviews
+        </button>
+        <button class="sidebar-link" id="sideChatHistory" onclick="showDashboardSection('chatHistory')">
+          <span class="sidebar-link-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          Chat History
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">ACCOUNT</div>
+        <button class="sidebar-link" id="sideProfile" onclick="showDashboardSection('profile')">
+          <span class="sidebar-link-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          Profile Info
+        </button>
+        <button class="sidebar-link" id="sideSettings" onclick="showDashboardSection('security')">
+          <span class="sidebar-link-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          Security
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="sidebar-link" onclick="showHomePage()">
+          <span class="sidebar-link-icon">&larr;</span> Back to Home
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="dashboard-main">
+
+      <!-- ── OVERVIEW ── -->
+      <div id="sectionOverview">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+          <div class="dashboard-page-title" id="greetingTitle">Welcome back</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span id="dashLastRefreshed" style="font-size:11px;color:var(--text-muted)"></span>
+            <button id="dashRefreshBtn" title="Refresh dashboard"
+              style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:var(--text-muted);display:flex;align-items:center;"
+              aria-label="Refresh dashboard data">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"/>
+                <polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p class="dashboard-page-sub">Here is a summary of your career assets and interview preparation.</p>
+
+        <!-- Stats row -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-card-label">DOCUMENTS STORED</div>
+            <div class="stat-card-value" id="statDocs">0</div>
+            <div class="stat-card-hint">Resumes, degrees, certificates</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">MOCK SESSIONS</div>
+            <div class="stat-card-value" id="statInterviews">0</div>
+            <div class="stat-card-hint">Total practice sessions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">COMPLETED INTERVIEWS</div>
+            <div class="stat-card-value" id="statCompleted">0</div>
+            <div class="stat-card-hint">Fully reviewed sessions</div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div style="display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="showDashboardSection('interviews');el('newInterviewBtn')?.click()">+ Start Mock Interview</button>
+          <button class="btn btn-ghost" onclick="showDashboardSection('portfolio');el('openUploadDocBtn')?.click()">+ Upload Document</button>
+          <button class="btn btn-ghost" onclick="showHomePage();el('resume')?.scrollIntoView({behavior:'smooth'})">Analyze New Resume</button>
+        </div>
+
+        <!-- Recent items grid -->
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-header">
+              <strong>Recent Documents</strong>
+              <button class="btn btn-ghost btn-sm" onclick="showDashboardSection('portfolio')">View all &rarr;</button>
+            </div>
+            <div class="card-body" id="recentDocsArea">
+              <p class="text-muted text-small">No documents uploaded yet.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <strong>Recent Interview Sessions</strong>
+              <button class="btn btn-ghost btn-sm" onclick="showDashboardSection('interviews')">View all &rarr;</button>
+            </div>
+            <div class="card-body" id="recentInterviewsArea">
+              <p class="text-muted text-small">No interviews started yet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PORTFOLIO ── -->
+      <div id="sectionPortfolio" class="hidden">
+        <div class="flex-between mb-24">
+          <div>
+            <div class="dashboard-page-title">Career Portfolio</div>
+            <p class="dashboard-page-sub" style="margin:0">Securely organize all your career documentation and proofs.</p>
+          </div>
+          <button class="btn btn-primary" id="openUploadDocBtn">+ Upload Document</button>
+        </div>
+
+        <!-- Upload doc modal trigger area -->
+        <div class="card hidden" id="uploadDocPanel" style="margin-bottom:24px;">
+          <div class="card-header">
+            <strong>Upload New Document</strong>
+            <button class="btn btn-ghost btn-sm" id="closeUploadDocPanel">Cancel</button>
+          </div>
+          <div class="card-body">
+            <form id="docUploadForm" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">File</label>
+                <input type="file" id="docFile" class="form-input" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Document name</label>
+                <input type="text" id="docName" class="form-input" placeholder="e.g., AWS Solutions Architect Cert">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Category</label>
+                <select id="docCategory" class="form-select">
+                  <option value="Resume/CV">Resume/CV</option>
+                  <option value="Certificate">Certificate</option>
+                  <option value="Internship Certificate">Internship Certificate</option>
+                  <option value="Experience Letter">Experience Letter</option>
+                  <option value="Degree/Marksheet">Degree/Marksheet</option>
+                  <option value="Project">Project</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Description <span class="text-muted">(optional)</span></label>
+                <input type="text" id="docDescription" class="form-input" placeholder="Brief notes or description">
+              </div>
+              <div style="grid-column:1/-1;">
+                <div class="alert alert-error hidden" id="docUploadError"></div>
+                <button type="submit" class="btn btn-primary" id="docUploadBtn">Upload document</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="category-tabs mb-16" id="docFilterTabs">
+          <button class="category-tab active" data-cat="All">All</button>
+          <button class="category-tab" data-cat="Resume/CV">Resume/CV</button>
+          <button class="category-tab" data-cat="Certificate">Certificate</button>
+          <button class="category-tab" data-cat="Internship Certificate">Internship</button>
+          <button class="category-tab" data-cat="Experience Letter">Experience</button>
+          <button class="category-tab" data-cat="Degree/Marksheet">Degree</button>
+          <button class="category-tab" data-cat="Project">Project</button>
+          <button class="category-tab" data-cat="Other">Other</button>
+        </div>
+
+        <div class="doc-grid" id="docGrid">
+          <p class="text-muted text-small" id="docEmptyMsg">Loading documents...</p>
+        </div>
+      </div>
+
+      <!-- ── MOCK INTERVIEWS ── -->
+      <div id="sectionInterviews" class="hidden">
+        <div class="flex-between mb-24">
+          <div>
+            <div class="dashboard-page-title">Mock Interviews</div>
+            <p class="dashboard-page-sub" style="margin:0">Practice company-specific technical and behavioral questions.</p>
+          </div>
+          <button class="btn btn-primary" id="newInterviewBtn">+ New Interview</button>
+        </div>
+
+        <!-- Setup Panel -->
+        <div class="interview-setup hidden" id="interviewSetupPanel">
+          <h3 style="margin-bottom:6px;font-size:18px;">Start a New Interview Session</h3>
+          <p class="text-muted text-small" style="margin-bottom:24px;">Select target employer and specialization.</p>
+          <form id="interviewSetupForm" style="display:grid;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Target Company</label>
+              <input type="text" id="interviewCompany" class="form-input" placeholder="e.g., Google, Amazon, TCS..." list="companySuggestions">
+              <datalist id="companySuggestions">
+                <option value="Google"><option value="Amazon"><option value="Microsoft">
+                <option value="Meta"><option value="Apple"><option value="Netflix">
+                <option value="Infosys"><option value="TCS"><option value="Wipro">
+                <option value="Accenture"><option value="Startup">
+              </datalist>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Target Role</label>
+              <select id="interviewRole" class="form-select">
+                <option value="">Select a role...</option>
+                <option>Data Analyst</option><option>Data Scientist</option>
+                <option>Machine Learning Engineer</option><option>Business Analyst</option>
+                <option>Python Developer</option><option>Frontend Developer</option>
+                <option>Database Developer</option><option>Software Developer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Number of Questions</label>
+              <select id="interviewCount" class="form-select">
+                <option value="10">10 questions</option>
+                <option value="15" selected>15 questions</option>
+                <option value="20">20 questions</option>
+              </select>
+            </div>
+            <div class="alert alert-error hidden" id="interviewSetupError"></div>
+            <div style="display:flex;gap:10px;">
+              <button type="submit" class="btn btn-primary">Generate Questions &rarr;</button>
+              <button type="button" class="btn btn-ghost" id="cancelInterviewSetup">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Active Interview Panel -->
+        <div class="hidden" id="interviewActivePanel">
+          <div class="question-card">
+            <div class="question-progress">
+              <div class="flex-between" style="gap:8px;flex-wrap:wrap">
+                <span style="font-size:13px;font-weight:600;" id="progressLabel">Question 1 of 15</span>
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                  <span id="questionSourceBadge" class="badge-practice">AI-Generated Practice</span>
+                  <span class="badge badge-blue" id="questionCategoryBadge">Technical</span>
+                </div>
+              </div>
+              <div class="question-progress-bar">
+                <div class="question-progress-fill" id="progressFill" style="width:7%"></div>
+              </div>
+            </div>
+            <div class="question-body">
+              <div class="question-category" id="activeCategoryLabel">TECHNICAL</div>
+              <div class="question-text" id="activeQuestionText">Loading question...</div>
+              <div id="questionSourceNote" class="source-note-box hidden"></div>
+              <div class="form-group">
+                <label class="form-label">Your Response</label>
+                <textarea class="form-textarea" id="answerTextarea" rows="5" placeholder="Formulate your structured response. Use technical depth, code/logic, or the STAR method for behavioral questions..."></textarea>
+              </div>
+              <div class="feedback-box hidden" id="feedbackBox"></div>
+            </div>
+            <div class="question-footer">
+              <button class="btn btn-ghost btn-sm" id="prevQuestionBtn" disabled>&larr; Previous</button>
+              <span style="font-size:13px;color:var(--text-muted)" id="interviewCompanyRole">Google &middot; Software Developer</span>
+              <button class="btn btn-primary btn-sm" id="nextQuestionBtn">Submit &amp; Next &rarr;</button>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm mt-12" id="exitInterviewBtn">&larr; Back to sessions list</button>
+        </div>
+
+        <!-- Sessions List -->
+        <div id="interviewSessionsList">
+          <p class="text-muted text-small" id="interviewEmptyMsg">Loading sessions...</p>
+        </div>
+      </div>
+
+      <!-- ── CHAT HISTORY ── -->
+      <div id="sectionChatHistory" class="hidden">
+        <div class="flex-between mb-24">
+          <div>
+            <div class="dashboard-page-title">Conversation History</div>
+            <p class="dashboard-page-sub" style="margin:0">Archived consultations with your career assistant.</p>
+          </div>
+          <button class="btn btn-danger btn-sm" id="clearChatHistoryBtn">Clear history</button>
+        </div>
+        <div class="card">
+          <div class="card-body" id="chatHistoryList" style="max-height:500px;overflow-y:auto;">
+            <p class="text-muted text-small">Loading history...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROFILE ── -->
+      <div id="sectionProfile" class="hidden">
+        <div class="dashboard-page-title">Profile &amp; Career Info</div>
+        <p class="dashboard-page-sub">Configure your target credentials and professional links.</p>
+
+        <div class="card" style="max-width:640px;">
+          <div class="card-header"><strong>Professional Profile</strong></div>
+          <div class="card-body">
+            <form id="profileForm" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Full name</label>
+                <input type="text" id="profileName" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Target job title</label>
+                <input type="text" id="profileJobTitle" class="form-input" placeholder="e.g., Senior Data Analyst">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input type="text" id="profilePhone" class="form-input" placeholder="+1 (555) 019-2834">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" id="profileLocation" class="form-input" placeholder="San Francisco, CA">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Years of experience</label>
+                <input type="number" id="profileExpYears" class="form-input" min="0" max="50">
+              </div>
+              <div class="form-group">
+                <label class="form-label">LinkedIn URL</label>
+                <input type="url" id="profileLinkedIn" class="form-input" placeholder="https://linkedin.com/in/...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">GitHub / Portfolio URL</label>
+                <input type="url" id="profileGitHub" class="form-input" placeholder="https://github.com/...">
+              </div>
+              <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Professional Summary</label>
+                <textarea id="profileBio" class="form-textarea" rows="3" placeholder="Brief summary of your background, technical interests, and career objectives..."></textarea>
+              </div>
+              <div style="grid-column:1/-1;">
+                <div class="alert alert-success hidden" id="profileSuccess"></div>
+                <div class="alert alert-error hidden" id="profileError"></div>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECURITY ── -->
+      <div id="sectionSecurity" class="hidden">
+        <div class="dashboard-page-title">Account Security</div>
+        <p class="dashboard-page-sub">Manage your account authentication credentials.</p>
+
+        <div class="card" style="max-width:480px;">
+          <div class="card-header"><strong>Change Password</strong></div>
+          <div class="card-body">
+            <form id="passwordForm" style="display:grid;gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Current password</label>
+                <input type="password" id="currentPassword" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">New password</label>
+                <input type="password" id="newPassword" class="form-input">
+                <span class="form-hint">Must be at least 8 characters</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirm new password</label>
+                <input type="password" id="confirmPassword" class="form-input">
+              </div>
+              <div>
+                <div class="alert alert-success hidden" id="passwordSuccess"></div>
+                <div class="alert alert-error hidden" id="passwordError"></div>
+                <button type="submit" class="btn btn-primary">Update password</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /dashboard-main -->
+  </div><!-- /dashboard-layout -->
+</main>
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer class="footer" id="mainFooter">
+  <div class="footer-wrap wrap">
+    <div class="footer-brand">
+      <a class="brand" href="#home">
+        <div class="brand-icon" style="width:28px;height:28px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>
+        </div>
+        <div class="brand-text">Career<span>Lens</span></div>
+      </a>
+      <p class="footer-tagline">Precision career navigation & ATS diagnostic intelligence for modern tech careers.</p>
+    </div>
+    <div class="footer-right">
+      <div class="footer-meta">
+        <span>Deterministic Scoring</span>
+        <span class="footer-sep">&bull;</span>
+        <span>Zero Storage of Raw Resumes</span>
+        <span class="footer-sep">&bull;</span>
+        <span class="gmail-pill">Gmail Authentication</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════
+     AI CHATBOT WIDGET
+═══════════════════════════════════════════════════ -->
+<button class="chatbot-toggle" id="chatbotToggle" title="Open Career Assistant">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</button>
+
+<div class="chatbot-window hidden" id="chatbotWindow">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+    <div class="chatbot-title-wrap">
+      <div class="chatbot-name">Career Lens Assistant</div>
+      <div class="chatbot-status">
+        <span class="status-indicator-dot"></span>
+        <span>Online &middot; Career Strategist</span>
+      </div>
+    </div>
+    <button class="chatbot-close" id="chatbotClose" aria-label="Close Assistant">&times;</button>
+  </div>
+
+  <div class="chatbot-messages" id="chatMessages">
+    <div class="chat-msg bot">
+      <p>Hello! I am your <strong>Career Lens Assistant</strong>.</p>
+      <p>I can help optimize your resume for ATS scanners, prepare for technical or behavioral interview loops, or recommend skills for your target role.</p>
+      <p>How can I assist your career progression today?</p>
+    </div>
+  </div>
+
+  <div class="chatbot-input-area">
+    <input class="chatbot-input" id="chatInput" type="text" placeholder="Ask about resume tips, interview questions..." maxlength="1000">
+    <button class="chatbot-send" id="chatSendBtn" title="Send message" aria-label="Send message">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>

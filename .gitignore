@@ -1,0 +1,42 @@
+# Environment variables (NEVER COMMIT SECRETS)
+.env
+.env.local
+.env.*.local
+
+# Virtual environments
+.venv/
+.venv_windows/
+venv/
+env/
+ENV/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+careerlens.db
+
+# User uploaded files
+uploads/*
+!uploads/.gitkeep
+
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDEs & editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
