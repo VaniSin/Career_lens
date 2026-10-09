@@ -1,42 +1,28 @@
-# Environment variables (NEVER COMMIT SECRETS)
-.env
-.env.local
-.env.*.local
-
-# Virtual environments
+# Virtual Environments
 .venv/
 .venv_windows/
-venv/
 env/
+venv/
 ENV/
 
-# Python cache & artifacts
+# Python cache & build
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.pytest_cache/
 
-# Databases
-*.db
-*.sqlite
-*.sqlite3
+# Environment secrets & config
+.env
+.env.local
+
+# Database & user uploads
 careerlens.db
-
-# User uploaded files
+careerlens.db-journal
+careerlens.db-wal
 uploads/*
 !uploads/.gitkeep
 
-# macOS metadata
+# Operating system files
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# IDEs & editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
+Thumbs.db
+__MACOSX/

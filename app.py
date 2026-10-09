@@ -48,6 +48,9 @@ app.register_blueprint(portfolio_bp)
 app.register_blueprint(interview_bp)
 app.register_blueprint(chatbot_bp)
 
+# Initialize database schema (ensures SQLite tables exist under Gunicorn/WSGI)
+init_db()
+
 # In-memory resume cache (per session, as in original)
 resume_cache: dict[str, str] = {}
 
